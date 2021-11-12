@@ -1,0 +1,233 @@
+% Document setup
+\documentclass[article, a4paper, 11pt, oneside]{memoir}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[UKenglish]{babel}
+
+% Document info
+\newcommand\doctitle{Dynkin systems and independence}
+\newcommand\docauthor{Danny Nygård Hansen}
+
+% Formatting and layout
+\usepackage[autostyle]{csquotes}
+\usepackage[final]{microtype}
+\usepackage{xcolor}
+\frenchspacing
+\usepackage{latex-sty/articlepagestyle}
+\usepackage{latex-sty/articlesectionstyle}
+
+% Fonts
+\usepackage[largesmallcaps,partialup]{kpfonts}
+\DeclareSymbolFontAlphabet{\mathrm}{operators} % https://tex.stackexchange.com/questions/40874/kpfonts-siunitx-and-math-alphabets
+\linespread{1.06}
+\let\mathfrak\undefined
+\usepackage{eufrak}
+\usepackage{inconsolata}
+\usepackage{amssymb}
+
+% Hyperlinks
+\usepackage{hyperref}
+\definecolor{linkcolor}{HTML}{4f4fa3}
+\hypersetup{%
+	pdftitle=\doctitle,
+	pdfauthor=\docauthor,
+	colorlinks,
+	linkcolor=linkcolor,
+	citecolor=linkcolor,
+	urlcolor=linkcolor,
+	bookmarksnumbered=true
+}
+
+% Equation numbering
+\numberwithin{equation}{chapter}
+
+% Footnotes
+\footmarkstyle{\textsuperscript{#1}\hspace{0.25em}}
+
+% Mathematics
+\usepackage{latex-sty/basicmathcommands}
+\usepackage{latex-sty/framedtheorems}
+\usepackage{latex-sty/probabilitycommands}
+\usepackage{tikz-cd}
+\usetikzlibrary{babel}
+
+% Lists
+\usepackage{enumitem}
+\setenumerate[0]{label=\normalfont(\arabic*)}
+
+% Bibliography
+\usepackage[backend=biber, style=authoryear, maxcitenames=2, useprefix]{biblatex}
+\addbibresource{references.bib}
+
+% Title
+\title{\doctitle}
+\author{\docauthor}
+
+
+% Section style -- add to section style .sty?
+\setsubsecheadstyle{\normalfont\itshape}
+
+
+% Preimage -- to be added to mathcommands .sty
+\newcommand{\preim}{^{-1}}
+
+
+\newcommand{\calN}{\mathcal{N}}
+\DeclarePairedDelimiter{\nhoodfilteraux}{(}{)}
+% \newcommand{\nhoodfilter}[1]{\calN\nhoodfilteraux{#1}}
+\newcommand{\nhoodfilter}[1]{\calN_{#1}}
+
+
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calV}{\mathcal{V}}
+\newcommand{\calW}{\mathcal{W}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calS}{\mathcal{S}}
+
+\newcommand{\borel}[1]{\calB(#1)}
+\DeclareMathOperator{\supp}{supp}
+
+\let\oldP\P
+\renewcommand{\P}{\mathbb{P}}
+
+\begin{document}
+
+\maketitle
+
+
+\chapter{Introduction}
+
+These notes are basically a proof of Theorem~6.3 in Bauer.
+
+
+\chapter{Dynkin systems}
+
+\begin{definition}[Dynkin systems]
+    A collection $\calD$ of subsets of a set $X$ is called a \emph{Dynkin system} in $X$ if
+    %
+    \begin{enumdef}
+        \item $X \in \calD$,
+        \item $B \setminus A \in \calD$ for $A,B \in \calD$ with $A \subseteq B$, and
+        \item $\bigunion_{n\in\naturals} A_n \in \calD$ for every increasing sequence $(A_n)_{n\in\naturals}$ of sets in $\calD$.
+    \end{enumdef}
+\end{definition}
+%
+A Dynkin system is also variously called a Dynkin class, $\delta$-system, $d$-system, or $\lambda$-system. Clearly every $\sigma$-algebra is a Dynkin system.
+
+The motivation for considering Dynkin systems is twofold. First of all they are significantly simpler than $\sigma$-algebras, and working with Dynkin systems instead of $\sigma$-algebras can often we done with no loss of generality, as the following fundamental result shows:
+
+\begin{theorem}[Dynkin's Lemma]
+    Let $\calS$ be a collection of subsets of a set $X$ that is closed under finite intersections. Then
+    %
+    \begin{equation*}
+        \delta(\calS) = \sigma(\calS).
+    \end{equation*}
+\end{theorem}
+%
+Also known as \textquote{Dynkin's $\pi$-$\lambda$ theorem} since a non-empty collection of sets that is closed under finite intersections is also called a $\pi$-system.
+
+\begin{proof}
+    Bauer Theorem~2.3 (different definition of Dynkin systems), Cohn Theorem~1.6.2.
+\end{proof}
+
+Another source of motivation comes from the following result about finite measures which is important when proving uniqueness of properties of finite or $\sigma$-finite measures:
+
+\begin{lemma}
+    \label{thm:finite-measures-agree-on-Dynkin}
+    Let $\mu$ and $\nu$ be finite measures on a measurable space $(X,\calE)$ such that $\mu(X) = \nu(X)$. The family $\calD \subseteq \calE$ of sets on which $\mu$ and $\nu$ agree is a Dynkin system.
+\end{lemma}
+
+\begin{proof}
+    By assumption $X \in \calD$. Let $A_1, A_2 \in \calD$ with $A_1 \subseteq A_2$. Then
+    %
+    \begin{equation*}
+        \mu(A_2 \setminus A_1)
+            = \mu(A_2) - \mu(A_1)
+            = \nu(A_2) - \nu(A_1)
+            = \nu(A_2 \setminus A_1),
+    \end{equation*}
+    %
+    since $\mu$ and $\nu$ are finite. Finally assume that $(A_n)_{n\in\naturals}$ is an increasing sequence of elements in $\calD$. Then by continuity we have
+    %
+    \begin{equation*}
+        \mu \Bigl( \bigunion_{n\in\naturals} A_n \Bigr)
+            = \lim_{n\to\infty} \mu(A_n)
+            = \lim_{n\to\infty} \nu(A_n)
+            = \nu \Bigl( \bigunion_{n\in\naturals} A_n \Bigr).
+    \end{equation*}
+    %
+    Thus $\calD$ is a Dynkin system as claimed.
+\end{proof}
+
+
+\chapter{Independence}
+
+Below we let $(\Omega, \calF, \P)$ be a fixed probability space.
+
+\begin{definition}[Independence I]
+    Let $I$ be a non-empty index set. A family $(A_i)_{i \in I}$ of events from $\calF$ is called \emph{independent} relative to $\P$ if
+    %
+    \begin{equation*}
+        \P \Bigl( \bigintersect_{\nu = 1}^n A_{i_\nu} \Bigr)
+            = \bigprod_{\nu = 1}^n \P(A_{i_\nu}),
+    \end{equation*}
+    %
+    for any finite subset $\{ i_1, \ldots, i_n \}$ of distinct elements of $I$.
+\end{definition}
+
+
+\begin{definition}[Independence II]
+    Let $(\calA_i)_{i \in I}$ be a family of sets $\calA_i \subseteq \calF$ of events. This family is called \emph{independent} if
+    %
+    \begin{equation*}
+        \P \Bigl( \bigintersect_{\nu = 1}^n A_{i_\nu} \Bigr)
+            = \bigprod_{\nu = 1}^n \P(A_{i_\nu}),
+    \end{equation*}
+    %
+    for any choice of events $A_{i_\nu} \in \calA_{i_\nu}$ and any finite subset $\{ i_1, \ldots, i_n \}$ of distinct elements of $I$.
+\end{definition}
+%
+Notice that this definition reduces to the first one if all $\calA_i$ are singletons.
+
+\begin{remark}
+    \label{rem:finite-subfamilies-independent}
+    Finite subfamilies independent is sufficient.
+\end{remark}
+
+\begin{proposition}
+    Let $(\calA_i)_{i \in I}$ be an independent family of sets of events from $\calF$. Then the family $(\delta(\calA_i))_{i \in I}$ is also independent. In particular, if the $\calA_i$ are closed under intersection, the family $(\sigma(\calA_i))_{i \in I}$ is independent.
+\end{proposition}
+
+\begin{proof}
+    By \cref{rem:finite-subfamilies-independent} we may assume that $I$ is finite.
+
+    Fix an index $i_0 \in I$, and choose sets $A_{i_\nu} \in \calA_{i_\nu}$ for distinct indices $i_1, \ldots, i_n \in I \setminus \{i_0\}$. Then define measures $\P_1$ and $\P_2$ on $\calF$ by
+    %
+    \begin{equation*}
+        \P_1(A)
+            = \P \Bigl( A \intersect \bigintersect_{\nu = 1}^n A_{i_\nu} \Bigr)
+        \quad \text{and} \quad
+        \P_2(A)
+            = \P(A) \bigprod_{\nu = 1}^n \P(A_{i_\nu}),
+    \end{equation*}
+    %
+    for $A \in \calF$. Notice that $\P_1$ and $\P_2$ agree on $\calA_{i_0}$ by independence, so since $\P_1(\Omega) = \P_2(\Omega)$, \cref{thm:finite-measures-agree-on-Dynkin} implies that they also agree on $\delta(\calA_{i_0})$. It follows that
+    %
+    \begin{equation*}
+        \P \Bigl( A \intersect \bigintersect_{\nu = 1}^n A_{i_\nu} \Bigr)
+            = \P(A) \bigprod_{\nu = 1}^n \P(A_{i_\nu})
+    \end{equation*}
+    %
+    for all choices of sets $A_{i_\nu} \in \calA_{i_\nu}$. But this precisely expresses the independence of the family $(\calA_i)_{i \in I}$ with $\calA_{i_0}$ replaced by $\delta(\calA_{i_0})$.
+
+    Performing a finite number of such replacements, once for each index in $I$, proves the first claim. The second claim follows by Dynkin's lemma.
+\end{proof}
+
+% References: Cohn, Bauer, Bauer
+
+\end{document}
